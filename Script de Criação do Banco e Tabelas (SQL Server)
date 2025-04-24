@@ -1,0 +1,74 @@
+Script de Criação do Banco e Tabelas (SQL Server)
+
+-- Criar banco de dados
+CREATE DATABASE LojaDB;
+GO
+
+-- Usar o banco de dados criado
+USE LojaDB;
+GO
+
+-- Criar a sequence para ID de pessoa
+CREATE SEQUENCE seq_pessoa_id
+    START WITH 1
+    INCREMENT BY 1;
+GO
+
+-- Tabela de usuários
+CREATE TABLE Usuario (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nome_usuario VARCHAR(50) NOT NULL,
+    senha VARCHAR(50) NOT NULL
+);
+GO
+
+-- Tabela Pessoa (superclasse)
+CREATE TABLE Pessoa (
+    id INT PRIMARY KEY,
+    nome VARCHAR(100),
+    endereco VARCHAR(150),
+    telefone VARCHAR(20),
+    email VARCHAR(100)
+);
+GO
+
+-- Pessoa Física
+CREATE TABLE PessoaFisica (
+    id INT PRIMARY KEY,
+    cpf VARCHAR(14) NOT NULL UNIQUE,
+    FOREIGN KEY (id) REFERENCES Pessoa(id)
+);
+GO
+
+-- Pessoa Jurídica
+CREATE TABLE PessoaJuridica (
+    id INT PRIMARY KEY,
+    cnpj VARCHAR(18) NOT NULL UNIQUE,
+    FOREIGN KEY (id) REFERENCES Pessoa(id)
+);
+GO
+
+-- Tabela Produto
+CREATE TABLE Produto (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    quantidade INT NOT NULL,
+    preco_venda DECIMAL(10,2) NOT NULL
+);
+GO
+
+-- Tabela Movimentação
+CREATE TABLE Movimentacao (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    tipo CHAR(1) CHECK (tipo IN ('E', 'S')), -- E=Entrada, S=Saída
+    id_produto INT NOT NULL,
+    id_operador INT NOT NULL,
+    id_pessoa INT NOT NULL,
+    quantidade INT NOT NULL,
+    preco_unitario DECIMAL(10,2) NOT NULL,
+    data_movimentacao DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (id_produto) REFERENCES Produto(id),
+    FOREIGN KEY (id_operador) REFERENCES Usuario(id),
+    FOREIGN KEY (id_pessoa) REFERENCES Pessoa(id)
+);
+GO
